@@ -1,0 +1,163 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>البدور — استقبال الأموال (تجريبي) v2</title>
+  <style>
+    body{font-family: "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif; background:#f6f8fa; margin:0; padding:20px; color:#0f1724}
+    .card{max-width:420px;margin:30px auto;background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(16,24,40,0.08);padding:18px;}
+    .logo{display:flex;align-items:center;gap:12px}
+    .mark{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#0ea5a5,#06b6d4);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px}
+    h1{margin:8px 0 2px;font-size:18px}
+    p.lead{margin:0;color:#475569;font-size:13px}
+    .balance{margin-top:18px;background:#f1f5f9;padding:12px;border-radius:12px;text-align:center}
+    .balance .amount{font-size:24px;font-weight:700;color:#0f1724}
+    label{display:block;margin-top:14px;font-weight:600}
+    input[type="text"]{width:100%;padding:12px;border-radius:10px;border:1px solid #e6eef6;background:#fff;font-size:16px}
+    .small{font-size:12px;color:#64748b;margin-top:6px}
+    .row{display:flex;gap:10px;margin-top:14px}
+    .btn{flex:1;padding:12px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg,#06b6d4,#0ea5a5);color:#fff}
+    .btn-ghost{background:#fff;border:1px solid #e2e8f0;color:#0f1724}
+    .hint{margin-top:12px;font-size:13px;color:#475569}
+    .status{margin-top:14px;padding:10px;border-radius:10px;background:#ecfdf5;color:#065f46;display:none}
+    .fingerprint{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:14px}
+    .fp-btn{width:72px;height:72px;border-radius:50%;background:linear-gradient(180deg,#fff,#eef2ff);display:flex;align-items:center;justify-content:center;border:2px solid #e6eef6;cursor:pointer}
+    .code-box{margin-top:12px;padding:10px;border-radius:10px;background:#f8fafc;border:1px dashed #e6eef6}
+    .code-text{font-weight:700;direction:ltr;text-align:center;letter-spacing:1px;font-size:16px}
+    .muted{font-size:12px;color:#64748b;margin-top:8px}
+    .copy-btn{margin-top:8px;padding:8px 10px;border-radius:8px;border:none;background:#0ea5a5;color:#fff;cursor:pointer;width:100%}
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-label="واجهة استقبال الأموال">
+    <div class="logo">
+      <div class="mark">ب</div>
+      <div>
+        <h1>البدور</h1>
+        <p class="lead">استقبال الأموال — نسخة تجريبية</p>
+      </div>
+    </div>
+
+    <div class="balance" aria-live="polite">
+      <div>الرصيد الحالي</div>
+      <div class="amount" id="balance">50.00 USD</div>
+    </div>
+
+    <label for="code">أدخل كود التحويل الموحد</label>
+    <input id="code" type="text" placeholder="مثال: BDR-ALT-...">
+
+    <label for="phone">رقم هاتفك (للاستلام)</label>
+    <input id="phone" type="text" placeholder="+9627xxxxxxxx">
+
+    <div class="small">لحماية المبلغ: سيتحقق النظام من ملكية رقم الهاتف عبر رسالة تحقق (OTP)</div>
+
+    <div class="fingerprint" aria-hidden="false">
+      <div class="fp-btn" id="fpBtn" title="تأكيد بالبصمة">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 3C9.243 3 7 5.243 7 8v1.5" stroke="#0f1724" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 21c2.757 0 5-2.243 5-5v-1.5" stroke="#0f1724" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M5 12c0-3.866 3.134-7 7-7s7 3.134 7 7v.5" stroke="#0f1724" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-weight:700">تأكيد بالبصمة</div>
+        <div class="small">اضغط لتأكيد ملكية جهازك</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="generateBtn" class="btn btn-ghost">توليد كود</button>
+      <button id="receiveBtn" class="btn btn-primary">استقبال الأموال</button>
+    </div>
+
+    <div class="code-box" id="codeBox" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="muted">كود مختصر للمستخدم</div>
+        <div class="muted">كود داخلي (موقّع)</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <div style="flex:1;background:#fff;padding:8px;border-radius:8px;border:1px solid #e6eef6">
+          <div class="code-text" id="shortCode">BDR-XXXX</div>
+        </div>
+        <div style="flex:2;background:#fff;padding:8px;border-radius:8px;border:1px solid #e6eef6;direction:ltr;overflow:auto">
+          <div class="code-text" id="longCode">BDR-ALT-20250917T144523Z-7f3b9a-6c2f...</div>
+        </div>
+      </div>
+      <button class="copy-btn" id="copyBtn">نسخ الكود المختصر</button>
+    </div>
+
+    <div class="status" id="statusBox" role="status"></div>
+
+    <p class="hint">هذه نسخة تجريبية: في النسخة الحقيقية سيُوقّع الكود بخادم آمن وسيُرسَل OTP للرقم المستلم.</p>
+  </div>
+
+  <script>
+    const balanceEl = document.getElementById('balance');
+    const receiveBtn = document.getElementById('receiveBtn');
+    const codeInput = document.getElementById('code');
+    const phoneInput = document.getElementById('phone');
+    const statusBox = document.getElementById('statusBox');
+    const fpBtn = document.getElementById('fpBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const codeBox = document.getElementById('codeBox');
+    const shortCodeEl = document.getElementById('shortCode');
+    const longCodeEl = document.getElementById('longCode');
+    const copyBtn = document.getElementById('copyBtn');
+
+    function showStatus(msg, success=true) {
+      statusBox.style.display = 'block';
+      statusBox.style.background = success ? '#ecfdf5' : '#fff1f2';
+      statusBox.style.color = success ? '#065f46' : '#991b1b';
+      statusBox.textContent = msg;
+      setTimeout(()=> statusBox.style.display='none', 6000);
+    }
+
+    fpBtn.addEventListener('click', () => {
+      showStatus('تم التحقق من بصمتك بنجاح ✅');
+    });
+
+    generateBtn.addEventListener('click', () => {
+      // generate short code BDR-XXXX (4 alnum) and a simulated signed token
+      const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let short = 'BDR-';
+      for (let i=0;i<4;i++) short += alpha[Math.floor(Math.random()*alpha.length)];
+      const now = new Date().toISOString().replace(/[:.]/g,'').slice(0,15);
+      const nonce = Math.random().toString(36).slice(2,10);
+      const long = `BDR-ALT-${now}-${nonce}-SIG${Math.floor(Math.random()*1e8).toString(16)}`;
+      shortCodeEl.textContent = short;
+      longCodeEl.textContent = long;
+      codeBox.style.display = 'block';
+      codeInput.value = short; // auto-fill the input with the short code for quick test
+      showStatus('تم توليد الكود. يمكنك مشاركته أو استخدامه للاختبار.');
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const text = shortCodeEl.textContent;
+      navigator.clipboard && navigator.clipboard.writeText(text);
+      showStatus('تم نسخ الكود إلى الحافظة ✅');
+    });
+
+    receiveBtn.addEventListener('click', () => {
+      const code = codeInput.value.trim();
+      const phone = phoneInput.value.trim();
+      if (!code) { showStatus('أدخل كود التحويل أولاً', false); return; }
+      if (!phone || phone.length < 8) { showStatus('أدخل رقم هاتف صالح لاستلام الأموال', false); return; }
+
+      showStatus('جارٍ التحقق من الكود وصلاحية الاستلام...');
+
+      setTimeout(() => {
+        const added = 25.00;
+        const current = parseFloat(balanceEl.textContent);
+        const newBal = (current + added).toFixed(2);
+        balanceEl.textContent = newBal + ' USD';
+        showStatus('تم استلام المبلغ بنجاح ✅ المبلغ: ' + added + ' USD');
+        codeInput.value = '';
+      }, 1200);
+    });
+
+  </script>
+</body>
+</html>
