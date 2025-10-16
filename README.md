@@ -5,8 +5,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
-jobs:
+  branches: [ "main" ]jobs:
   build:
     runs-on: ubuntu-latest
     steps:
