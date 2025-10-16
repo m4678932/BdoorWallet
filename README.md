@@ -1,6 +1,6 @@
 [Bdoor](https://github.com/m4678932/BdoorWallet.git) Wallet
 Yaml
-name: CI
+name: bdoor Wallet 
 on:
   push:
     branches: [ "main" ]
@@ -13,6 +13,6 @@ on:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - run: npm install
-      - run: npm test
+        node-version: 18
+      - run: npm install      -
+     run: npm test
