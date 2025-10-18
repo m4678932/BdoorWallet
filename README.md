@@ -1,11 +1,10 @@
-[Bdoor](https://github.com/m4678932/BdoorWallet.git) Wallet
-Yaml
-name: bdoor Wallet 
-on:
-  push:
+[Bdoor](https://github.com/m4678932/BdoorW
+name: CI
+on:  push:
     branches: [ "main" ]
   pull_request:
-  branches: [ "main" ]jobs:
+    branches: [ "main" ]
+jobs:
   build:
     runs-on: ubuntu-latest
     steps:
@@ -13,6 +12,11 @@ on:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-        node-version: 18
-      - run: npm install      -
-     run: npm test
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Build project
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
